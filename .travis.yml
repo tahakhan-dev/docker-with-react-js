@@ -1,0 +1,21 @@
+language: generic
+sudo: required    #its mean super user level permisions to execute this build
+
+services:         #services to understand we need docker-cli to pre-install
+  - docker
+
+before_install:   #serires of commands that executed before our test run
+  - docker build -t stephengrider/docker-react -f Dockerfile.dev .
+
+script:       # command we needed to execute test
+  - docker run -e CI=true stephengrider/docker-react npm run test
+
+deploy: #after testing we deploy this build to aws "elastic bench"
+  provider: elasticbeanstalk  # service Name
+  region: "us-west-2"   
+  app:  "docker"
+  env:  "Docker-env"
+  bucket_name:  "elasticbeanstalk-us-west-2306479323"   #S3 bucket
+  bucket_path:  "docker"
+  on:
+    branch: master
